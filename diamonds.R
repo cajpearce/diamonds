@@ -55,7 +55,7 @@ add.predictions = function(.data) {
 brilliantearth = read.csv("brilliantearth.csv",stringsAsFactors = FALSE) %>% 
   read.diamonds() %>% 
   add.predictions() %>%
-  mutate(origin = "lab")
+  mutate(origin = "Lab Grown")
 
 
 # moissanite---------------
@@ -80,22 +80,12 @@ brilliantearth = read.csv("brilliantearth.csv",stringsAsFactors = FALSE) %>%
 # 
 #---------------
 
-brilliantearth.recent = read.csv("brilliantearth (recent).csv",stringsAsFactors = FALSE) %>% 
-  read.diamonds() %>% 
-  add.predictions() %>%
-  mutate(origin = "RECENT")
-
-
-bluenile = read.csv("bluenile.csv",stringsAsFactors = FALSE) %>% 
-  read.diamonds() %>% 
-  add.predictions() %>%
-  mutate(origin = "bluenile")
 
 
 diamonds = diamonds %>% 
   add.predictions() %>%
-  mutate(origin = "earth") %>% 
-  rbind(brilliantearth, brilliantearth.recent,bluenile)
+  mutate(origin = "Mined") %>% 
+  rbind(brilliantearth)
 
 
 gooddiamonds = diamonds %>% 
@@ -109,11 +99,21 @@ gooddiamonds = diamonds %>%
          origin %in% c("RECENT","lab","bluenile"))
 
 
-ggplot(gooddiamonds,
-       aes(price, diffdiv,
-           colour=origin
+ggplot(diamonds %>% filter(price < 20000),
+       aes(carat, price,
+           colour=origin,
+           group = origin
            )) +
-  geom_point()
+  geom_point(alpha = 0.1) +
+  # geom_smooth(se = FALSE,
+  #             method="lm") + 
+  ylab("Price") +
+  xlab("Carat") +
+  guides(fill=guide_legend(title="Origin")) +
+  # facet_wrap(~origin) +
+  scale_y_continuous(labels = scales::dollar) +
+  theme_minimal() +
+  ggtitle("Diamond plot of price vs carat size comparing lab grown diamonds vs mined diamonds")
 
 
 
